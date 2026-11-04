@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>امتحان تفاعلي شامل -  تصميم محمود زكي (ثانية ثانوي)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-300">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-brand-600 text-white w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-brand-500/30">
+                    G
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-slate-900 dark:text-white">امتحان لغة انجليزية تصميم محمود زكي  </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">الصف الثاني الثانوي - الوحدة الأولى (جميع أسئلة الاختيار من متعدد)</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button id="theme-toggle" class="p-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors">
+                    <i id="theme-toggle-dark-icon" class="fa-solid fa-moon text-lg hidden"></i>
+                    <i id="theme-toggle-light-icon" class="fa-solid fa-sun text-lg text-amber-400 hidden"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5">
+            <div id="progress-bar" class="bg-brand-500 h-1.5 w-0 transition-all duration-300"></div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+
+        <!-- Controls Bar -->
+        <div class="mb-6 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-4 text-sm font-semibold">
+                <span class="bg-brand-50 dark:bg-brand-700/30 text-brand-600 dark:text-brand-400 px-3 py-1.5 rounded-lg border border-brand-100 dark:border-brand-700">
+                    <i class="fa-solid fa-list-check ml-1.5"></i> إجمالي الأسئلة: <span id="total-questions">0</span>
+                </span>
+                <span class="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-100 dark:border-emerald-800">
+                    <i class="fa-solid fa-pen-to-square ml-1.5"></i> المكتمل: <span id="answered-count">0</span>
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="scrollToTop()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 px-3 py-2 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-arrow-up ml-1"></i> لأعلى
+                </button>
+                <button onclick="resetQuiz()" class="text-xs bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/50 px-3 py-2 rounded-lg font-medium transition border border-rose-200 dark:border-rose-800">
+                    <i class="fa-solid fa-rotate-right ml-1"></i> إعادة المحاولة
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Sections -->
+        <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+            <button onclick="filterQuestions('all')" id="filter-all" class="filter-btn active bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition whitespace-nowrap">
+                الكل (<span id="count-all">0</span>)
+            </button>
+            <button onclick="filterQuestions('vocab')" id="filter-vocab" class="filter-btn bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 transition whitespace-nowrap">
+                مفردات ومهارات (1 - 64)
+            </button>
+            <button onclick="filterQuestions('grammar')" id="filter-grammar" class="filter-btn bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 transition whitespace-nowrap">
+                قواعد ورابط جمل (77 - 113)
+            </button>
+        </div>
+
+        <!-- Questions List Container -->
+        <div id="questions-container" class="space-y-6">
+            <!-- Questions rendered via JS -->
+        </div>
+
+        <!-- Result Box -->
+        <div id="result-modal" class="mt-8 hidden bg-white dark:bg-slate-800 border-2 border-brand-500 p-6 md:p-8 rounded-3xl shadow-2xl text-center space-y-4">
+            <div class="w-20 h-20 mx-auto rounded-full bg-brand-100 dark:bg-brand-900/50 flex items-center justify-center text-brand-600 dark:text-brand-400 text-4xl mb-2">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">نتيجة الامتحان</h2>
+            <p class="text-slate-600 dark:text-slate-300">لقد أكملت جميع الأسئلة. إليك تفاصيل أدائك:</p>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 my-6">
+                <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-600">
+                    <span class="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-1">النتيجة الكلية</span>
+                    <span id="final-score" class="text-2xl font-bold text-brand-600 dark:text-brand-400">0 / 0</span>
+                </div>
+                <div class="bg-emerald-50 dark:bg-emerald-950/30 p-4 rounded-2xl border border-emerald-200 dark:border-emerald-800">
+                    <span class="block text-emerald-600 dark:text-emerald-400 text-xs font-semibold mb-1">الإجابات الصحيحة</span>
+                    <span id="correct-count" class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">0</span>
+                </div>
+                <div class="col-span-2 sm:col-span-1 bg-rose-50 dark:bg-rose-950/30 p-4 rounded-2xl border border-rose-200 dark:border-rose-800">
+                    <span class="block text-rose-600 dark:text-rose-400 text-xs font-semibold mb-1">النسبة المئوية</span>
+                    <span id="percentage" class="text-2xl font-bold text-rose-600 dark:text-rose-400">0%</span>
+                </div>
+            </div>
+
+            <button onclick="scrollToTop(); resetQuiz();" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-brand-500/30 transition transform hover:-translate-y-0.5">
+                إعادة المحاولة
+            </button>
+        </div>
+
+        <!-- Submit Button Floating/Fixed -->
+        <div class="mt-8 text-center sticky bottom-6 z-40">
+            <button id="submit-btn" onclick="submitQuiz()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-bold py-4 px-10 rounded-2xl shadow-xl shadow-emerald-600/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2 mx-auto">
+                <i class="fa-solid fa-paper-plane"></i> تصحيح وسحب النتيجة كاملة
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Quiz Logic -->
+    <script>
+        // Full Question Bank (MCQ 1 to 64 & MCQ 77 to 113)
+        const allQuestions = [
+            // Vocabulary & Skills Questions (1-64)
+            { id: 1, cat: "vocab", q: "A lifestyle account shows only carefully selected achievements and removes ordinary moments. The account is best described as", opts: ["a. balanced", "b. curated", "c. private", "d. unrelated"], ans: 1 },
+            { id: 2, cat: "vocab", q: "Health experts recommend combining a/an ...... lifestyle with physical activity to combat the risks of a sedentary routine.", opts: ["a. biased", "b. underestimated", "c. mindless", "d. balanced"], ans: 3 },
+            { id: 3, cat: "vocab", q: "Hind begins to judge her ordinary school day against influencers' holiday photographs. This is an example of", opts: ["a. social comparison", "b. mindful consumption", "c. structural support", "d. personal agency"], ans: 0 },
+            { id: 4, cat: "vocab", q: "A post showing only perfect moments is", opts: ["a. measurable", "b. sedentary", "c. structural", "d. curated"], ans: 3 },
+            { id: 5, cat: "vocab", q: "Doctors recommend regular exercise to counter the effects of a/an ...... routine.", opts: ["a. active", "b. energetic", "c. sedentary", "d. mindful"], ans: 2 },
+            { id: 6, cat: "vocab", q: "A lifestyle with very little movement is", opts: ["a. balanced", "b. curated", "c. mindful", "d. sedentary"], ans: 3 },
+            { id: 7, cat: "vocab", q: "Paying careful attention to the present moment is", opts: ["a. agency", "b. bias", "c. mindfulness", "d. pressure"], ans: 2 },
+            { id: 8, cat: "vocab", q: "Comparing ordinary life with influencers' best moments is", opts: ["a. social comparison", "b. mindfulness", "c. agency", "d. nutrition"], ans: 0 },
+            { id: 9, cat: "vocab", q: "Teenagers ...... by supportive families may maintain healthier habits.", opts: ["a. encouraged", "b. encouraging", "c. encourage", "d. encourages"], ans: 0 },
+            { id: 10, cat: "vocab", q: "Language that strongly favors one side shows", opts: ["a. bias", "b. resilience", "c. mindfulness", "d. nutrition"], ans: 0 },
+            { id: 11, cat: "vocab", q: "Food that provides the body with what it needs supports good", opts: ["a. comparison", "b. nutrition", "c. advertising", "d. isolation"], ans: 1 },
+            { id: 12, cat: "vocab", q: "A ...... is a health expert who gives advice on diet and nutrition.", opts: ["a. representative", "b. curator", "c. nutritionist", "d. psychologist"], ans: 2 },
+            { id: 13, cat: "vocab", q: "The workshop aims to ...... students to take control of their financial future.", opts: ["a. weaken", "b. deprive", "c. restrain", "d. empower"], ans: 3 },
+            { id: 14, cat: "vocab", q: "The power to make choices and act independently is", opts: ["a. bias", "b. agency", "c. nutrition", "d. isolation"], ans: 1 },
+            { id: 15, cat: "vocab", q: "A barrier in the environment that limits genuine choice is a", opts: ["a. structural barrier", "b. highlight reel", "c. rhetorical question", "d. intensifier"], ans: 0 },
+            { id: 16, cat: "vocab", q: "Belief in one's ability to succeed is", opts: ["a. bias", "b. social comparison", "c. sedentary behavior", "d. self-efficacy"], ans: 3 },
+            { id: 17, cat: "vocab", q: "The word \"sedentary\" means", opts: ["a. energetic", "b. active", "c. mindful", "d. inactive"], ans: 3 },
+            { id: 18, cat: "vocab", q: "The ability to recover after difficulty is", opts: ["a. resilience", "b. curation", "c. nutrition", "d. pressure"], ans: 0 },
+            { id: 19, cat: "vocab", q: "A gentle policy that encourages a choice without forcing it is a", opts: ["a. comparison", "b. bias", "c. nudge", "d. claim"], ans: 2 },
+            { id: 20, cat: "vocab", q: "A health expert who advises about diet is a", opts: ["a. curator", "b. nutritionist", "c. representative", "d. journalist"], ans: 1 },
+            { id: 21, cat: "vocab", q: "The phrase \"highlight-reel effect\" is closest in meaning to", opts: ["a. real image", "b. complete picture", "c. honest", "d. curated reality"], ans: 3 },
+            { id: 22, cat: "vocab", q: "The ability to recover after difficulty is", opts: ["a. resilience", "b. bias", "c. nutrition", "d. agency"], ans: 0 },
+            { id: 23, cat: "vocab", q: "A person confident in the ability to succeed has high", opts: ["a. curation", "b. bias", "c. social comparison", "d. self-efficacy"], ans: 3 },
+            { id: 24, cat: "vocab", q: "Challenger is known as brilliant but extremely", opts: ["a. careless", "b. shy", "c. difficult", "d. ordinary"], ans: 2 },
+            { id: 25, cat: "vocab", q: "\"Actions can improve health, even if change takes time.\" This belief best shows", opts: ["a. sedentary behavior", "b. social comparison", "c. highlight-reel effect", "d. self-efficacy"], ans: 3 },
+            { id: 26, cat: "vocab", q: "\"Constant criticism can seriously damage a teenager's self-esteem.\" The underlined noun has an antonymous meaning to", opts: ["a. self-respect", "b. self-worth", "c. self-confidence", "d. self-doubt"], ans: 3 },
+            { id: 27, cat: "vocab", q: "\"The report used hedging to avoid making absolute claims about the results.\" The underlined noun is closest in meaning to", opts: ["a. certainty", "b. caution", "c. confidence", "d. assertiveness"], ans: 1 },
+            { id: 28, cat: "vocab", q: "A fair report should present both viewpoints using", opts: ["a. emotional language", "b. persuasive language", "c. neutral language", "d. exaggerated language"], ans: 2 },
+            { id: 29, cat: "vocab", q: "Sharing only awards and celebrations online can create a", opts: ["a. social connection", "b. highlight-reel effect", "c. balanced view", "d. factual impression"], ans: 1 },
+            { id: 30, cat: "vocab", q: "The importance of regular sleep is often ...... by busy students.", opts: ["a. appreciated", "b. exaggerated", "c. underestimated", "d. measured"], ans: 2 },
+            { id: 31, cat: "vocab", q: "Spending most of the day sitting may lead to a ...... lifestyle.", opts: ["a. energetic", "b. sedentary", "c. active", "d. athletic"], ans: 1 },
+            { id: 32, cat: "vocab", q: "The researchers wanted ...... results that could be tracked over time.", opts: ["a. imaginary", "b. emotional", "c. selective", "d. measurable"], ans: 3 },
+            { id: 33, cat: "vocab", q: "Packaged snacks with added sugar and preservatives are usually", opts: ["a. natural food", "b. fresh produce", "c. processed food", "d. raw food"], ans: 2 },
+            { id: 34, cat: "vocab", q: "An ...... culture usually places strong emphasis on personal freedom and independence.", opts: ["a. collective", "b. cooperative", "c. individualistic", "d. communal"], ans: 2 },
+            { id: 35, cat: "vocab", q: "Regular exercise can ...... improved physical and emotional wellbeing.", opts: ["a. result in", "b. damage", "c. avoid", "d. cancel"], ans: 0 },
+            { id: 36, cat: "vocab", q: "Losing interest in hobbies for a long time and feeling persistently sad may indicate", opts: ["a. mindfulness", "b. nutrition", "c. well-being", "d. depression"], ans: 3 },
+            { id: 37, cat: "vocab", q: "\"Daily mindfulness exercises helped the athlete remain calm before important competitions.\" The underlined noun has an antonymous meaning to", opts: ["a. awareness", "b. focus", "c. distraction", "d. attentiveness"], ans: 2 },
+            { id: 38, cat: "vocab", q: "\"Long hours of sitting without exercise can make office work highly sedentary.\" The underlined adjective is closest in meaning to", opts: ["a. inactive", "b. energetic", "c. active", "d. lively"], ans: 0 },
+            { id: 39, cat: "vocab", q: "Checking whether you really need an item before buying it shows", opts: ["a. social comparison", "b. mindful consumption", "c. processed food", "d. dissatisfaction"], ans: 1 },
+            { id: 40, cat: "vocab", q: "Improving sleep quality and reducing daily stress may strengthen a person's", opts: ["a. dissatisfaction", "b. competition", "c. isolation", "d. well-being"], ans: 3 },
+            { id: 41, cat: "vocab", q: "Learning to plan your time can help you ...... a heavy workload.", opts: ["a. fail to meet", "b. result in", "c. cope with", "d. set up"], ans: 2 },
+            { id: 42, cat: "vocab", q: "He remained calm ...... he was facing a very difficult situation.", opts: ["a. although", "b. because of", "c. despite", "d. due to"], ans: 0 },
+            { id: 43, cat: "vocab", q: "\"Her resilience helped her recover quickly after several disappointing results.\" The underlined noun is closest in meaning to", opts: ["a. vulnerability", "b. adaptability", "c. fragility", "d. weakness"], ans: 1 },
+            { id: 44, cat: "vocab", q: "\"Constantly telling students that they cannot succeed can be disempowering.\" The underlined adjective is closest in meaning to", opts: ["a. supportive", "b. motivating", "c. discouraging", "d. empowering"], ans: 2 },
+            { id: 45, cat: "vocab", q: "Giving learners more freedom can encourage them to ...... of their progress.", opts: ["a. lose control", "b. take ownership", "c. give up", "d. avoid responsibility"], ans: 1 },
+            { id: 46, cat: "vocab", q: "In a ...... workplace, employees are expected to support shared goals and cooperate closely.", opts: ["a. competitive", "b. collectivist", "c. individualistic", "d. independent"], ans: 1 },
+            { id: 47, cat: "vocab", q: "Which sentence is the most neutral?", opts: ["a. Anyone who rests is lazy.", "b. This routine is absolutely perfect for everyone.", "c. Some students may find an early routine helpful.", "d. Only unsuccessful people miss a workout."], ans: 2 },
+            { id: 48, cat: "vocab", q: "Mindful consumption includes being aware of", opts: ["a. only the amount of food on a plate", "b. food, media, products, and information we take in", "c. only the number of hours spent studying", "d. competitive sports results"], ans: 1 },
+            { id: 49, cat: "vocab", q: "Based on the context, what does \"well-being\" mean?", opts: ["a. The ability to succeed in difficult tasks", "b. The habit of following a strict daily routine", "c. A state of being healthy, comfortable, and happy", "d. A feeling of excitement caused by achievement"], ans: 2 },
+            { id: 50, cat: "vocab", q: "Which situation is a structural barrier?", opts: ["a. A student chooses not to bring sneakers.", "b. A neighborhood has no safe pavement or affordable sports facility.", "c. A teenager prefers reading to football.", "d. A family reminds a child to sleep earlier."], ans: 1 },
+            { id: 51, cat: "vocab", q: "Which example is a nudge?", opts: ["a. Banning every drink except water.", "b. Placing free water stations beside school entrances.", "c. Punishing students who buy snacks.", "d. Removing all choice from the cafeteria."], ans: 1 },
+            { id: 52, cat: "vocab", q: "Agency refers to a person's ability to", opts: ["a. avoid all social expectations", "b. control other people's decisions", "c. make choices and take independent action", "d. copy the behavior of influencers"], ans: 2 },
+            { id: 53, cat: "vocab", q: "Which factor is most likely to weaken a claim based on a school survey?", opts: ["a. A clearly described sample", "b. A very small or unrepresentative sample", "c. A question about stress", "d. A table showing percentages"], ans: 1 },
+            { id: 54, cat: "vocab", q: "\"A mindful student thinks before sharing photos online.\" The underlined adjective mindful has an antonymous meaning to", opts: ["a. attentive", "b. aware", "c. thoughtful", "d. careless"], ans: 3 },
+            { id: 55, cat: "vocab", q: "Which persuasive technique is used in \"Do we really want screens to replace every face-to-face experience?\"", opts: ["a. An intensifier", "b. A rhetorical question", "c. A hedging word", "d. A word family"], ans: 1 },
+            { id: 56, cat: "vocab", q: "After improving her sleep, diet, and relationships, Hind noticed a clear improvement in her well-being. What does well-being mean in this context?", opts: ["a. The state of being healthy, comfortable and happy.", "b. The process of comparing yourself with others.", "c. The ability to become famous online.", "d. The habit of avoiding all responsibilities."], ans: 0 },
+            { id: 57, cat: "vocab", q: "A podcast host invited only guests who agreed with his views and dismissed opposing opinions without discussing them fairly. Listeners described the program as biased. Which situation is the clearest example of being \"biased\"?", opts: ["a. A judge scores every performance according to the same published rules.", "b. A judge gives a friend a higher score even though another performer clearly did better.", "c. A judge asks another official to review a result that is extremely close.", "d. A judge changes a score after noticing a genuine mistake in the first calculation."], ans: 1 },
+            { id: 58, cat: "vocab", q: "Constant social comparison made Ahmed feel that his life was less successful than the lives he saw online. What does social comparison mean in this context?", opts: ["a. Judging yourself by comparing your life with other people's lives.", "b. Discussing social problems with friends.", "c. Studying the traditions of different societies.", "d. Sharing personal information online."], ans: 0 },
+            { id: 59, cat: "vocab", q: "What is the main effect of a rhetorical question?", opts: ["a. To make the reader think", "b. To show uncertainty", "c. To weaken an argument", "d. To give detailed evidence"], ans: 0 },
+            { id: 60, cat: "vocab", q: "Which of the following is an intensifier?", opts: ["a. might", "b. never", "c. extremely", "d. could"], ans: 2 },
+            { id: 61, cat: "vocab", q: "Which persuasive technique is used in \"Can any teenager realistically maintain this routine every day?\"", opts: ["a. An intensifier", "b. A rhetorical question", "c. An absolute word", "d. A relative clause"], ans: 1 },
+            { id: 62, cat: "vocab", q: "In \"an amazing achievement,\" \"amazing\" is an", opts: ["a. intensifier", "b. neutral expression", "c. evaluative adjective", "d. rhetorical question"], ans: 2 },
+            { id: 63, cat: "vocab", q: "Constant exposure to perfect online lifestyles can ...... among young users.", opts: ["a. build healthy habits", "b. create unrealistic expectations", "c. reduce social pressure", "d. improve self-awareness"], ans: 1 },
+            { id: 64, cat: "vocab", q: "The researcher chose only the results that supported his theory and ignored the rest. Which adjective best describes this choice?", opts: ["a. objective", "b. selective", "c. neutral", "d. balanced"], ans: 1 },
+
+            // Grammar Questions (77-113)
+            { id: 77, cat: "grammar", q: "Only one sentence in each group is grammatically correct. Choose the correct answer.", opts: ["a. Students who sleeps regularly often concentrate more effectively.", "b. Students slept regularly often concentrate more effectively.", "c. Students sleeping regularly often concentrate more effectively.", "d. Sleeping regularly, concentration improves the students."], ans: 2 },
+            { id: 78, cat: "grammar", q: "Only one sentence in each group is grammatically correct. Choose the correct answer.", opts: ["a. Chosen balanced meals, teenagers can support steady energy levels.", "b. Teenagers choosing balanced meals, they can support steady energy levels.", "c. Choosing balanced meals, steady energy supports teenagers.", "d. Choosing balanced meals, teenagers can support steady energy levels."], ans: 3 },
+            { id: 79, cat: "grammar", q: "Only one sentence in each group is grammatically correct. Choose the correct answer.", opts: ["a. The habits, that reduce stress are different for each person.", "b. The habits which reduce stress can be practiced daily.", "c. The habits reducing stress, they can be practiced daily.", "d. The habits which reducing stress can be practiced daily."], ans: 1 },
+            { id: 80, cat: "grammar", q: "Only one sentence in each group is grammatically correct. Choose the correct answer.", opts: ["a. Supported by family members, many teenagers maintain healthier routines.", "b. Supporting by family members, many teenagers maintain healthier routines.", "c. Supported family members, many teenagers, maintain healthier routines.", "d. Many teenagers supported by family members, they maintain healthier routines."], ans: 0 },
+            { id: 81, cat: "grammar", q: "Only one sentence in each group is grammatically correct. Choose the correct answer.", opts: ["a. If schools offered counseling, students may felt better supported.", "b. If schools had offer counseling, students would have felt better supported.", "c. If schools offer counseling, students would have felt better supported yesterday.", "d. If schools offer counseling, students may feel better supported."], ans: 3 },
+            { id: 82, cat: "grammar", q: "Only one sentence in each group is grammatically correct. Choose the correct answer.", opts: ["a. Teenagers which practice mindfulness often manage stress more effectively.", "b. Teenagers practiced mindfulness, they often manage stress more effectively.", "c. Teenagers who practice mindfulness often manage stress more effectively.", "d. Practicing mindfulness, stress manages teenagers more effectively."], ans: 2 },
+            { id: 83, cat: "grammar", q: "Only one sentence in each group is grammatically correct. Choose the correct answer.", opts: ["a. The bridge, which was built in 1920, is still in use.", "b. The bridge, who was built in 1920, is still in use.", "c. The bridge, whose was built in 1920, is still in use.", "d. The bridge, where was built in 1920, is still in use."], ans: 0 },
+            { id: 84, cat: "grammar", q: "Only one sentence in each group is grammatically correct. Choose the correct answer.", opts: ["a. The report who was published yesterday has attracted considerable attention.", "b. The report where was published yesterday has attracted considerable attention.", "c. The report whose was published yesterday has attracted considerable attention.", "d. The report that was published yesterday has attracted considerable attention."], ans: 3 },
+            { id: 85, cat: "grammar", q: "Only one sentence in each group is grammatically correct. Choose the correct answer.", opts: ["a. The documents finding in the archive were more valuable than expected.", "b. The documents found in the archive was more valuable than expected.", "c. The documents were found in the archive were more valuable than expected.", "d. The documents found in the archive were more valuable than expected."], ans: 3 },
+            { id: 86, cat: "grammar", q: "Only one sentence in each group is grammatically correct. Choose the correct answer.", opts: ["a. The woman waiting outside is the director of the company.", "b. The woman waited outside is the director of the company.", "c. The woman waiting outside are the director of the company.", "d. The woman to waiting outside is the director of the company."], ans: 0 },
+            { id: 87, cat: "grammar", q: "Only one sentence in each group is grammatically correct. Choose the correct answer.", opts: ["a. The candidates selected for the final interview will be contacted tomorrow.", "b. The candidates selecting for the final interview will be contacted tomorrow.", "c. The candidates selected for the final interview will be contact tomorrow.", "d. The candidates were selected for the final interview will be contacted tomorrow."], ans: 0 },
+            { id: 88, cat: "grammar", q: "The habits ...... reduce stress can be practiced daily.", opts: ["a. which", "b. where", "c. when", "d. whose"], ans: 0 },
+            { id: 89, cat: "grammar", q: "People ...... regularly may improve physical and mental well-being.", opts: ["a. exercised", "b. exercising", "c. exercise", "d. exercises"], ans: 1 },
+            { id: 90, cat: "grammar", q: "...... by family members, many teenagers maintain healthier routines.", opts: ["a. Supports", "b. Supporting", "c. Support", "d. Supported"], ans: 3 },
+            { id: 91, cat: "grammar", q: "Students ...... regularly often concentrate better.", opts: ["a. sleep", "b. slept", "c. sleeping", "d. sleeps"], ans: 2 },
+            { id: 92, cat: "grammar", q: "...... balanced meals, teenagers can support steady energy.", opts: ["a. Chose", "b. Chosen", "c. Choose", "d. Choosing"], ans: 3 },
+            { id: 93, cat: "grammar", q: "...... by several independent researchers, the results deserve careful consideration.", opts: ["a. Having examined", "b. Examining", "c. Having been examined", "d. To examined"], ans: 2 },
+            { id: 94, cat: "grammar", q: "The museum, ...... was renovated last year, attracts thousands of visitors.", opts: ["a. that", "b. which", "c. where", "d. what"], ans: 1 },
+            { id: 95, cat: "grammar", q: "...... enough evidence, the committee would reconsider its decision.", opts: ["a. If there were", "b. If there is", "c. If there will be", "d. If there had"], ans: 0 },
+            { id: 96, cat: "grammar", q: "Students ...... regularly read outside class tend to develop stronger vocabulary.", opts: ["a. which", "b. whose", "c. who", "d. whom"], ans: 2 },
+            { id: 97, cat: "grammar", q: "...... by their health goals, many individuals choose to adopt a more active lifestyle.", opts: ["a. Motivating", "b. Motivated", "c. Motivate", "d. Who motivated"], ans: 1 },
+            { id: 98, cat: "grammar", q: "If the study ...... more schools, the findings would have been more conclusive.", opts: ["a. includes", "b. have included", "c. included", "d. had included"], ans: 3 },
+            { id: 99, cat: "grammar", q: "...... having free time, let's have coffee together.", opts: ["a. Without", "b. In case of", "c. If", "d. Unless"], ans: 1 },
+            { id: 100, cat: "grammar", q: "You can't have a good job ...... good qualifications.", opts: ["a. unless", "b. if", "c. without", "d. in case"], ans: 2 },
+            { id: 101, cat: "grammar", q: "If I were tall, I would play basketball. This means that I ...... tall.", opts: ["a. am not", "b. am", "c. was not", "d. was"], ans: 0 },
+            { id: 102, cat: "grammar", q: "...... careful, he wouldn't make that silly mistake.", opts: ["a. Is he", "b. Wasn't he", "c. Were he", "d. Isn't he"], ans: 2 },
+            { id: 103, cat: "grammar", q: "...... being accurate is necessary, I'll overlook the so many mistakes you make.", opts: ["a. Unless", "b. If", "c. In case of", "d. Without"], ans: 0 },
+            { id: 104, cat: "grammar", q: "No sooner ...... she finished speaking than the audience erupted into applause.", opts: ["a. No sooner had", "b. No sooner did", "c. Hardly had", "d. Scarcely had"], ans: 0 },
+            { id: 105, cat: "grammar", q: "...... to the meeting, Hany decided not to attend.", opts: ["a. Not invite", "b. Not inviting", "c. Not invited", "d. Not to invite"], ans: 2 },
+            { id: 106, cat: "grammar", q: "...... several times, the old machine finally stopped working completely.", opts: ["a. Fixing", "b. Fix", "c. Having been fixed", "d. To fixed"], ans: 2 },
+            { id: 107, cat: "grammar", q: "The flat, ...... the sea, costs much.", opts: ["a. that overlook", "b. which overlook", "c. overlooks", "d. overlooking"], ans: 3 },
+            { id: 108, cat: "grammar", q: "She is the most intelligent girl ...... I have ever seen.", opts: ["a. who's", "b. to whom", "c. that", "d. whose"], ans: 2 },
+            { id: 109, cat: "grammar", q: "Most of the novels ...... by Taha Hussein were translated into different languages.", opts: ["a. written", "b. which written", "c. writing", "d. were written"], ans: 0 },
+            { id: 110, cat: "grammar", q: "The car ...... last night has been found.", opts: ["a. was stolen", "b. which stolen", "c. stolen", "d. stealing"], ans: 2 },
+            { id: 111, cat: "grammar", q: "The city, ...... my aunt lives in, is so far away.", opts: ["a. which", "b. who", "c. where", "d. when"], ans: 0 },
+            { id: 112, cat: "grammar", q: "The tourists ...... stay in Egypt was wonderful decided to come back again.", opts: ["a. who", "b. which", "c. where", "d. whose"], ans: 3 },
+            { id: 113, cat: "grammar", q: "I don't know the person with ...... I was chatting.", opts: ["a. who", "b. which", "c. that", "d. whom"], ans: 3 }
+        ];
+
+        // App State
+        let userAnswers = {};
+        let currentFilter = 'all';
+        let isSubmitted = false;
+
+        // Dark/Light Theme toggle
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
+        });
+
+        // Initialize App
+        function initApp() {
+            document.getElementById('total-questions').innerText = allQuestions.length;
+            document.getElementById('count-all').innerText = allQuestions.length;
+            renderQuestions();
+            updateProgress();
+        }
+
+        // Render Questions
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+
+            const filtered = allQuestions.filter(q => currentFilter === 'all' || q.cat === currentFilter);
+
+            filtered.forEach(q => {
+                const card = document.createElement('div');
+                card.className = "question-card bg-white dark:bg-slate-800 p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 transition duration-200";
+                card.id = `q-card-${q.id}`;
+
+                let selectedIndex = userAnswers[q.id];
+
+                let optsHtml = q.opts.map((opt, optIdx) => {
+                    let optStyle = "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 hover:border-brand-500 text-slate-700 dark:text-slate-300";
+                    let badge = "";
+
+                    if (selectedIndex === optIdx) {
+                        optStyle = "border-brand-500 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 font-semibold ring-1 ring-brand-500";
+                    }
+
+                    if (isSubmitted) {
+                        if (optIdx === q.ans) {
+                            optStyle = "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold ring-2 ring-emerald-500";
+                            badge = `<span class="mr-auto bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full"><i class="fa-solid fa-check"></i> الصحيحة</span>`;
+                        } else if (selectedIndex === optIdx && selectedIndex !== q.ans) {
+                            optStyle = "border-rose-500 bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 font-bold ring-2 ring-rose-500";
+                            badge = `<span class="mr-auto bg-rose-500 text-white text-xs px-2 py-0.5 rounded-full"><i class="fa-solid fa-xmark"></i> خطأ</span>`;
+                        }
+                    }
+
+                    return `
+                        <button onclick="selectOption(${q.id}, ${optIdx})" 
+                                ${isSubmitted ? 'disabled' : ''} 
+                                class="w-full text-right p-3.5 rounded-xl border text-sm md:text-base flex items-center transition-all duration-150 ${optStyle} direction-ltr">
+                            <span class="inline-block font-sans">${opt}</span>
+                            ${badge}
+                        </button>
+                    `;
+                }).join('');
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-3 mb-4">
+                        <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600">
+                            سؤال #${q.id}
+                        </span>
+                        <span class="text-xs font-semibold ${q.cat === 'vocab' ? 'text-blue-500' : 'text-purple-500'}">
+                            ${q.cat === 'vocab' ? 'Vocabulary' : 'Grammar'}
+                        </span>
+                    </div>
+                    <div class="question-text text-slate-900 dark:text-slate-100 font-semibold text-base md:text-lg mb-4 direction-ltr leading-relaxed">
+                        ${q.q}
+                    </div>
+                    <div class="space-y-2.5">
+                        ${optsHtml}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Option selection
+        function selectOption(qId, optIdx) {
+            if (isSubmitted) return;
+            userAnswers[qId] = optIdx;
+            updateProgress();
+            renderQuestions();
+        }
+
+        // Progress update
+        function updateProgress() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const totalCount = allQuestions.length;
+            document.getElementById('answered-count').innerText = answeredCount;
+            
+            const percentage = (answeredCount / totalCount) * 100;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+        }
+
+        // Filter Questions
+        function filterQuestions(category) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-brand-600', 'text-white');
+                btn.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+            });
+
+            const activeBtn = document.getElementById(`filter-${category}`);
+            activeBtn.classList.add('active', 'bg-brand-600', 'text-white');
+            activeBtn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+
+            renderQuestions();
+        }
+
+        // Submit Quiz
+        function submitQuiz() {
+            isSubmitted = true;
+            let correct = 0;
+
+            allQuestions.forEach(q => {
+                if (userAnswers[q.id] === q.ans) {
+                    correct++;
+                }
+            });
+
+            const total = allQuestions.length;
+            const percentage = Math.round((correct / total) * 100);
+
+            document.getElementById('final-score').innerText = `${correct} / ${total}`;
+            document.getElementById('correct-count').innerText = correct;
+            document.getElementById('percentage').innerText = `${percentage}%`;
+
+            document.getElementById('result-modal').classList.remove('hidden');
+            renderQuestions();
+
+            document.getElementById('result-modal').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Reset Quiz
+        function resetQuiz() {
+            userAnswers = {};
+            isSubmitted = false;
+            document.getElementById('result-modal').classList.add('hidden');
+            updateProgress();
+            renderQuestions();
+        }
+
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Run on load
+        window.onload = initApp;
+    </script>
+</body>
+</html>
